@@ -4726,14 +4726,19 @@ function createWebSocket (client, url, opts) {
 }
 
 function createBrowserWebSocket (client, opts) {
-  const websocketSubProtocol =
-  (opts.protocolId === 'MQIsdp') && (opts.protocolVersion === 3)
+  let websocketSubProtocols = [];
+
+  if (opts != undefined && opts.wsOptions !== undefined && opts.wsOptions.protocol !== undefined) {
+    websocketSubProtocols = opts.wsOptions.protocol.split(',');
+  }
+  
+  websocketSubProtocols.push((opts.protocolId === 'MQIsdp') && (opts.protocolVersion === 3)
     ? 'mqttv3.1'
-    : 'mqtt'
+    : 'mqtt');
 
   const url = buildUrl(opts, client)
   /* global WebSocket */
-  const socket = new WebSocket(url, [websocketSubProtocol])
+  const socket = new WebSocket(url, websocketSubProtocols)
   socket.binaryType = 'arraybuffer'
   return socket
 }
